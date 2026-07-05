@@ -328,6 +328,38 @@ section{padding:100px 0;}
 .leaflet-close{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;background:var(--paper-2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--head);font-size:16px;transition:background .2s;z-index:2;}
 .leaflet-close:hover{background:var(--amber-500);}
 .leaflet-body{padding:28px 30px 34px;}
+
+/* ---------- Callback / Lead form ---------- */
+.callback-fab{
+  position:fixed;right:24px;bottom:24px;z-index:900;
+  background:var(--teal-900);color:#fff;border:none;border-radius:999px;
+  padding:14px 22px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;
+  box-shadow:0 18px 34px -14px rgba(14,74,63,.5);cursor:pointer;transition:transform .25s ease,background .25s ease;
+}
+.callback-fab:hover{transform:translateY(-3px);background:var(--teal-700);}
+.callback-fab svg{width:18px;height:18px;}
+@media (max-width:600px){
+  .callback-fab{right:14px;bottom:14px;padding:12px 16px;font-size:12.5px;}
+  .callback-fab span{display:none;}
+  .callback-fab{border-radius:50%;width:50px;height:50px;padding:0;justify-content:center;}
+}
+.lead-form{display:flex;flex-direction:column;gap:14px;}
+.lead-form label{font-size:13px;font-weight:600;color:var(--head);margin-bottom:4px;display:block;}
+.lead-form input{
+  width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid rgba(14,74,63,.18);
+  background:var(--paper);color:var(--ink);font-size:14px;font-family:inherit;
+}
+.lead-form input:focus{outline:none;border-color:var(--teal-700);}
+.lead-form button{
+  margin-top:6px;background:var(--teal-900);color:#fff;border:none;border-radius:999px;
+  padding:13px 20px;font-size:14.5px;font-weight:700;cursor:pointer;transition:background .2s;
+}
+.lead-form button:hover{background:var(--teal-700);}
+.lead-form button:disabled{opacity:.6;cursor:not-allowed;}
+.lead-success{display:none;text-align:center;padding:10px 0;}
+.lead-success.show{display:block;}
+.lead-success .ok-icon{width:52px;height:52px;border-radius:50%;background:var(--mint-200);color:var(--teal-700);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.lead-success .ok-icon svg{width:26px;height:26px;}
 .leaflet-body .cat{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--accent-text);text-transform:uppercase;letter-spacing:.08em;}
 .leaflet-body h3{font-size:24px;color:var(--head);margin:6px 0 14px;}
 .leaflet-body .desc{color:var(--ink-soft);font-size:14.5px;line-height:1.7;margin-bottom:22px;}
@@ -685,6 +717,37 @@ footer{background:var(--teal-800);color:rgba(255,255,255,.7);padding:50px 0 26px
   <div class="leaflet" id="leafletBody"></div>
 </div>
 
+<button type="button" class="callback-fab" id="callbackFabBtn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+  <span data-i18n="callback_btn">Qo'ng'iroq so'rash</span>
+</button>
+
+<div class="modal-overlay" id="leadModalOverlay">
+  <div class="leaflet" style="max-width:420px;">
+    <button class="leaflet-close" id="leadCloseBtn">&times;</button>
+    <div class="leaflet-body">
+      <h3 style="color:var(--head);margin-bottom:6px;" data-i18n="lead_title">Qo'ng'iroq so'rash</h3>
+      <p style="color:var(--ink-soft);font-size:13.5px;margin-bottom:18px;" data-i18n="lead_sub">Ismingiz va telefon raqamingizni qoldiring — mutaxassislarimiz tez orada siz bilan bog'lanadi.</p>
+      <form class="lead-form" id="leadForm">
+        <div>
+          <label data-i18n="lead_name">Ismingiz</label>
+          <input type="text" id="leadName" required autocomplete="name">
+        </div>
+        <div>
+          <label data-i18n="lead_phone">Telefon raqamingiz</label>
+          <input type="tel" id="leadPhone" placeholder="+998 90 123 45 67" required autocomplete="tel">
+        </div>
+        <button type="submit" id="leadSubmitBtn" data-i18n="lead_send">Yuborish</button>
+      </form>
+      <div class="lead-success" id="leadSuccess">
+        <div class="ok-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <div style="color:var(--head);font-weight:700;margin-bottom:4px;" data-i18n="lead_ok_title">Qabul qilindi!</div>
+        <div style="color:var(--ink-soft);font-size:13.5px;" data-i18n="lead_ok_sub">Tez orada siz bilan bog'lanamiz.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 const IMG = {};
 </script>
@@ -749,6 +812,16 @@ const I18N = {
     stat_years:"yil tajriba", stat_products:"mahsulot turi", stat_dirs:"yo'nalish",
     hero_badge_title:"Sertifikatlangan", hero_badge_sub:"sifat nazorati",
     day_product:"Kun tavsiyasi",
+    callback_btn:"Qo'ng'iroq so'rash",
+    lead_title:"Qo'ng'iroq so'rash",
+    lead_sub:"Ismingiz va telefon raqamingizni qoldiring — mutaxassislarimiz tez orada siz bilan bog'lanadi.",
+    lead_name:"Ismingiz",
+    lead_phone:"Telefon raqamingiz",
+    lead_send:"Yuborish",
+    lead_sending:"Yuborilmoqda...",
+    lead_ok_title:"Qabul qilindi!",
+    lead_ok_sub:"Tez orada siz bilan bog'lanamiz.",
+    lead_error:"Xatolik yuz berdi. Iltimos, qayta urining yoki bizga qo'ng'iroq qiling.",
     about_eyebrow:"Missiyamiz",
     mission_text:"Biz insonlarning <span class='accent'>uzoqroq, sog'lomroq va baxtliroq</span> yashashiga yordam beruvchi mahsulot va yechimlar yaratamiz. Har kungi ishimiz minglab insonlarning sog'lig'iga ta'sir qiladi va bu jamoamizga kuch bag'ishlaydi.",
     mission_sub:"Biz bemorlar, hamkorlar va bir-birimizga g'amxo'rlik qilamiz — bu bizning kundalik faoliyatimiz markazida turadi.",
@@ -782,6 +855,16 @@ const I18N = {
     stat_years:"лет опыта", stat_products:"видов продукции", stat_dirs:"направления",
     hero_badge_title:"Сертифицировано", hero_badge_sub:"контроль качества",
     day_product:"Товар дня",
+    callback_btn:"Заказать звонок",
+    lead_title:"Заказать звонок",
+    lead_sub:"Оставьте имя и номер телефона — наши специалисты свяжутся с вами в ближайшее время.",
+    lead_name:"Ваше имя",
+    lead_phone:"Номер телефона",
+    lead_send:"Отправить",
+    lead_sending:"Отправка...",
+    lead_ok_title:"Заявка принята!",
+    lead_ok_sub:"Мы свяжемся с вами в ближайшее время.",
+    lead_error:"Произошла ошибка. Попробуйте ещё раз или позвоните нам.",
     about_eyebrow:"Наша миссия",
     mission_text:"Мы создаём продукты и решения, которые помогают людям жить <span class='accent'>дольше, здоровее и счастливее</span>. Наша ежедневная работа влияет на здоровье тысяч людей, и это придаёт силы нашей команде.",
     mission_sub:"Мы заботимся о пациентах, партнёрах и друг о друге — это лежит в основе нашей повседневной деятельности.",
@@ -815,6 +898,16 @@ const I18N = {
     stat_years:"years of experience", stat_products:"products", stat_dirs:"directions",
     hero_badge_title:"Certified", hero_badge_sub:"quality control",
     day_product:"Product of the day",
+    callback_btn:"Request a call",
+    lead_title:"Request a call",
+    lead_sub:"Leave your name and phone number — our specialists will contact you shortly.",
+    lead_name:"Your name",
+    lead_phone:"Phone number",
+    lead_send:"Send",
+    lead_sending:"Sending...",
+    lead_ok_title:"Request received!",
+    lead_ok_sub:"We will contact you shortly.",
+    lead_error:"Something went wrong. Please try again or call us.",
     about_eyebrow:"Our mission",
     mission_text:"We create products and solutions that help people live <span class='accent'>longer, healthier and happier</span> lives. Our daily work affects the health of thousands of people, and that gives our team strength.",
     mission_sub:"We care for patients, partners and each other — this is at the center of everything we do.",
@@ -1298,6 +1391,66 @@ renderProducts();
 renderCareers();
 renderNews();
 renderDailyProduct();
+
+/* ================= CALLBACK / LEAD FORM -> TELEGRAM ================= */
+const TG_BOT_TOKEN = "8994353115:AAHEz4sHx2c8ksf3a0VswGYSea44T1PZ7KY";
+const TG_CHAT_ID = "924394456";
+
+const leadModalOverlay = document.getElementById("leadModalOverlay");
+const callbackFabBtn = document.getElementById("callbackFabBtn");
+const leadCloseBtn = document.getElementById("leadCloseBtn");
+const leadForm = document.getElementById("leadForm");
+const leadSuccess = document.getElementById("leadSuccess");
+const leadSubmitBtn = document.getElementById("leadSubmitBtn");
+
+function openLeadModal(){
+  leadModalOverlay.classList.add("open");
+  leadForm.style.display = "flex";
+  leadSuccess.classList.remove("show");
+  leadForm.reset();
+}
+function closeLeadModal(){
+  leadModalOverlay.classList.remove("open");
+}
+
+if(callbackFabBtn) callbackFabBtn.addEventListener("click", openLeadModal);
+if(leadCloseBtn) leadCloseBtn.addEventListener("click", closeLeadModal);
+if(leadModalOverlay) leadModalOverlay.addEventListener("click", (e)=>{ if(e.target === leadModalOverlay) closeLeadModal(); });
+
+if(leadForm){
+  leadForm.addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    const dict = I18N[currentLang];
+    const name = document.getElementById("leadName").value.trim();
+    const phone = document.getElementById("leadPhone").value.trim();
+    if(!name || !phone) return;
+
+    leadSubmitBtn.disabled = true;
+    leadSubmitBtn.textContent = dict.lead_sending;
+
+    const text = `📞 Yangi qo'ng'iroq so'rovi (ANT GROUP saytidan)\n\n👤 Ism: ${name}\n📱 Telefon: ${phone}\n🌐 Til: ${currentLang.toUpperCase()}\n🕒 Vaqt: ${new Date().toLocaleString("uz-UZ")}`;
+
+    try{
+      const res = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ chat_id: TG_CHAT_ID, text: text })
+      });
+      const data = await res.json();
+      if(data.ok){
+        leadForm.style.display = "none";
+        leadSuccess.classList.add("show");
+      } else {
+        alert(dict.lead_error);
+      }
+    } catch(err){
+      alert(dict.lead_error);
+    } finally {
+      leadSubmitBtn.disabled = false;
+      leadSubmitBtn.textContent = dict.lead_send;
+    }
+  });
+}
 
 </script>
 </body>
