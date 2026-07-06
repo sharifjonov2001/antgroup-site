@@ -671,12 +671,12 @@ footer{background:var(--teal-800);color:rgba(255,255,255,.7);padding:50px 0 26px
     </div>
     <div class="contact-form reveal">
       <label data-i18n="form_name">Ismingiz</label>
-      <input type="text" placeholder="...">
+      <input type="text" id="contactName" placeholder="...">
       <label data-i18n="form_phone">Telefon raqam</label>
-      <input type="text" placeholder="+998 __ ___ __ __">
+      <input type="text" id="contactPhone" placeholder="+998 __ ___ __ __">
       <label data-i18n="form_msg">Xabar</label>
-      <textarea rows="4" placeholder="..."></textarea>
-      <button class="btn btn-amber" style="width:100%;justify-content:center;" data-i18n="form_btn">Yuborish</button>
+      <textarea rows="4" id="contactMsg" placeholder="..."></textarea>
+      <button class="btn btn-amber" id="contactSubmitBtn" style="width:100%;justify-content:center;" data-i18n="form_btn">Yuborish</button>
     </div>
   </div>
 </section>
@@ -1448,6 +1448,54 @@ if(leadForm){
     } finally {
       leadSubmitBtn.disabled = false;
       leadSubmitBtn.textContent = dict.lead_send;
+    }
+  });
+}
+
+/* ================= CONTACT SECTION FORM -> TELEGRAM ================= */
+const contactSubmitBtn = document.getElementById("contactSubmitBtn");
+if(contactSubmitBtn){
+  contactSubmitBtn.addEventListener("click", async (e)=>{
+    e.preventDefault();
+    const dict = I18N[currentLang];
+    const nameEl = document.getElementById("contactName");
+    const phoneEl = document.getElementById("contactPhone");
+    const msgEl = document.getElementById("contactMsg");
+    const name = nameEl.value.trim();
+    const phone = phoneEl.value.trim();
+    const msg = msgEl.value.trim();
+    if(!name || !phone){
+      nameEl.style.borderColor = !name ? "#e05252" : "";
+      phoneEl.style.borderColor = !phone ? "#e05252" : "";
+      return;
+    }
+
+    const originalText = contactSubmitBtn.textContent;
+    contactSubmitBtn.disabled = true;
+    contactSubmitBtn.textContent = dict.lead_sending;
+
+    const text = `✉️ Yangi murojaat (ANT GROUP saytidan, Aloqa bo'limi)\n\n👤 Ism: ${name}\n📱 Telefon: ${phone}\n💬 Xabar: ${msg || "—"}\n🌐 Til: ${currentLang.toUpperCase()}\n🕒 Vaqt: ${new Date().toLocaleString("uz-UZ")}`;
+
+    try{
+      const res = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ chat_id: TG_CHAT_ID, text: text })
+      });
+      const data = await res.json();
+      if(data.ok){
+        contactSubmitBtn.textContent = dict.lead_ok_title;
+        nameEl.value = ""; phoneEl.value = ""; msgEl.value = "";
+        setTimeout(()=>{ contactSubmitBtn.textContent = originalText; }, 3000);
+      } else {
+        alert(dict.lead_error);
+        contactSubmitBtn.textContent = originalText;
+      }
+    } catch(err){
+      alert(dict.lead_error);
+      contactSubmitBtn.textContent = originalText;
+    } finally {
+      contactSubmitBtn.disabled = false;
     }
   });
 }
