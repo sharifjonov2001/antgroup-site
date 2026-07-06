@@ -1578,8 +1578,8 @@ renderDailyProduct();
 renderEvents();
 
 /* ================= CALLBACK / LEAD FORM -> TELEGRAM ================= */
-const TG_BOT_TOKEN = "8994353115:AAHEz4sHx2c8ksf3a0VswGYSea44T1PZ7KY";
-const TG_CHAT_ID = "924394456";
+/* Telegram token endi kodda YO'Q — u Cloudflare Worker ichida saqlanadi. */
+const TG_PROXY_URL = "https://antgroup-forms.umid30795.workers.dev";
 
 const leadModalOverlay = document.getElementById("leadModalOverlay");
 const callbackFabBtn = document.getElementById("callbackFabBtn");
@@ -1613,13 +1613,11 @@ if(leadForm){
     leadSubmitBtn.disabled = true;
     leadSubmitBtn.textContent = dict.lead_sending;
 
-    const text = `📞 Yangi qo'ng'iroq so'rovi (ANT GROUP saytidan)\n\n👤 Ism: ${name}\n📱 Telefon: ${phone}\n🌐 Til: ${currentLang.toUpperCase()}\n🕒 Vaqt: ${new Date().toLocaleString("uz-UZ")}`;
-
     try{
-      const res = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+      const res = await fetch(TG_PROXY_URL, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ chat_id: TG_CHAT_ID, text: text })
+        body: JSON.stringify({ name: name, phone: phone, lang: currentLang, source: "lead" })
       });
       const data = await res.json();
       if(data.ok){
@@ -1659,13 +1657,11 @@ if(contactSubmitBtn){
     contactSubmitBtn.disabled = true;
     contactSubmitBtn.textContent = dict.lead_sending;
 
-    const text = `✉️ Yangi murojaat (ANT GROUP saytidan, Aloqa bo'limi)\n\n👤 Ism: ${name}\n📱 Telefon: ${phone}\n💬 Xabar: ${msg || "—"}\n🌐 Til: ${currentLang.toUpperCase()}\n🕒 Vaqt: ${new Date().toLocaleString("uz-UZ")}`;
-
     try{
-      const res = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+      const res = await fetch(TG_PROXY_URL, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ chat_id: TG_CHAT_ID, text: text })
+        body: JSON.stringify({ name: name, phone: phone, msg: msg, lang: currentLang, source: "contact" })
       });
       const data = await res.json();
       if(data.ok){
